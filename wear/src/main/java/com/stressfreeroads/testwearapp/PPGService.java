@@ -17,6 +17,7 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -80,16 +81,19 @@ public class PPGService extends Service implements SensorEventListener {
         // is this a heartbeat event and does it have data?
         if(sensorEvent.sensor.getType()==33171027 && sensorEvent.values.length>0 ) {
             int newValue = Math.round(sensorEvent.values[0]);
-            //Log.d(LOG_TAG,sensorEvent.sensor.getName() + " changed to: " + newValue);
+              //Log.d(LOG_TAG,sensorEvent.sensor.getName() + " changed to: " + newValue);
             // only do something if the value differs from the value before and the value is not 0.
             if(currentValue != newValue && newValue!=0) {
                 // save the new value
                 currentValue = newValue;
                 // send the value to the listener
                 if(onChangeListener!=null) {
-                    Log.d(LOG_TAG,"sending new value to listener: " + newValue);
+                    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                    System.out.println(timestamp);
+                    String timestampedVal = newValue+","+timestamp;
+                    Log.d(LOG_TAG,"sending new value to listener: " + timestampedVal);
                     onChangeListener.onValueChanged(newValue);
-                    sendMessageToHandheld(Integer.toString(newValue));
+                    sendMessageToHandheld(timestampedVal);
                 }
             }
         }
